@@ -1,14 +1,16 @@
 <?php
 // ¿Se ha enviado el formulario?
-$formularioEnviado = isset($_POST['enviar']);
+$formularioEnviado = isset($_GET['enviar']);
 
 // Recuperamos los datos (cadena vacía si no existen).
 $nombre = '';
 $email  = '';
+$maquinaenigma = '';
 
 if ($formularioEnviado) {
-    $nombre = $_POST['name'];
-    $email  = $_POST['email'];
+    $nombre = $_GET['name'];
+    $email  = $_GET['email'];
+    $maquinaenigma = $_GET['maquinaenigma'];
 }
 ?>
 <!DOCTYPE html>
@@ -20,9 +22,10 @@ if ($formularioEnviado) {
 </head>
 <body>
 
+
     <h1>Formulario</h1>
 
-    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
+    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="GET">
 
         <p>
             <label for="name">Nombre:</label>
@@ -31,7 +34,8 @@ if ($formularioEnviado) {
 
         <p>
             <label for="email">E-mail:</label>
-            <input type="text" id="email" name="email" value="<?= htmlspecialchars($email) ?>">
+            <input type="text" id="email" name="email" value= "<?= htmlspecialchars($email) ?>">
+            <input type="hidden" id="maquinaenigma" name="maquinaenigma" value="149">
         </p>
 
         <button type="submit" name="enviar" value="1">Enviar</button>
@@ -43,6 +47,7 @@ if ($formularioEnviado) {
         <h2>Resultado</h2>
         <p>Bienvenido, <strong><?= htmlspecialchars($nombre) ?></strong></p>
         <p>Tu e-mail es: <strong><?= htmlspecialchars($email) ?></strong></p>
+        <p>Máquina Enigma: <strong><?= htmlspecialchars($maquinaenigma) ?></strong></p>
     <?php endif; ?>
 
 </body>
