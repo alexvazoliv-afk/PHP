@@ -1,34 +1,34 @@
 <?php
-$numeroemails= " ";
+$numeroemails = '';
+$seguro = false;
+$error = '';
+$precio_total = null;
+$formularioEnviado = $_SERVER['REQUEST_METHOD'] === 'POST';
 
-$formularioEnviado = isset($_GET['calcular']);
 if ($formularioEnviado) {
-    if (is_int($_POST['numeroemails'])  ) {
-        $numeroemails= $_POST['numeroemails'];
-    }   else {
-        echo  " Valor no numerico";    
-        }
-        $seguro = $_POST['seguro'];
+    $numeroemails = $_POST['numeroemails'] ?? '';
+    $seguro = isset($_POST['seguro']);
+    $cantidad = filter_var($numeroemails, FILTER_VALIDATE_INT);
 
-    if ($numeroemails > 0 && $numeroemails < 2000) {
-        $precio_total=0;
-        # code...
-    }else if ($numeroemails > 200 && $numeroemails <10000) {
-        $precio_total = $numeroemails  * 0.7;
-    }elseif ($numeroemails >=10001) {
-        $precio_total = 0.2;
-        # code...
-    }
-    if ($seguro ==1) {
-        # code...
+    if ($cantidad === false || $cantidad < 1) {
+        $error = 'Introduce un número entero de emails mayor que cero.';
+    } else {
+        if ($cantidad <= 2000) {
+            $precio_total = 200;
+        } elseif ($cantidad <= 10000) {
+            $precio_total = $cantidad * 0.7;
+        } else {
+            $precio_total = $cantidad * 0.2;
+        }
+
+        if ($seguro) {
+            $precio_total += $cantidad * 0.1;
+        }
     }
 }
- 
-
-    
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,7 +54,7 @@ if ($formularioEnviado) {
          <tr>
             <td>0</td>
             <td>2000</td>
-            <td>0 €</td>
+            <td>200 €</td>
         </tr>
         <tr>
             <td>2001</td>
@@ -72,19 +72,18 @@ if ($formularioEnviado) {
         
     </table>
     <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="post">
-         <label for="numeroemails">Numero de emails que enviaras: </label>
-        <input type="number" name="numeroemails" min="1" max="1000000000000000000" value="<?= htmlspecialchars($numeroemails) ?>">
-          
-        <input type="checkbox"   name="seguro" value="1">
-        <label for="seguro"> Quiero el seguro POR 0.1 €</label><br>
-        <input type="submit" value="calcular" >
-        
-      
-       
+        <label for="numeroemails">Número de emails que enviarás:</label>
+        <input type="number" id="numeroemails" name="numeroemails" min="1" step="1" required value="<?= htmlspecialchars((string) $numeroemails, ENT_QUOTES, 'UTF-8') ?>">
 
-
-
-
+        <input type="checkbox" id="seguro" name="seguro" value="1" <?= $seguro ? 'checked' : '' ?>>
+        <label for="seguro">Quiero el seguro (0,10 € por email)</label><br>
+        <button type="submit">Calcular</button>
     </form>
+
+    <?php if ($formularioEnviado && $error !== ''): ?>
+        <p role="alert"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></p>
+    <?php elseif ($precio_total !== null): ?>
+        <p>Precio total: <strong><?= number_format($precio_total, 2, ',', '.') ?> €</strong></p>
+    <?php endif; ?>
 </body>
 </html>
